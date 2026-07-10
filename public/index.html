@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Faction War Arena</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10151c;color:#fff;font-family:system-ui,sans-serif}canvas{display:block}
+    #player-panel{position:fixed;top:16px;left:16px;width:236px;padding:12px 14px;border:1px solid #ffffff26;border-radius:14px;background:#0d131dcc;backdrop-filter:blur(8px);z-index:3}#status{font-size:12px;color:#c9d4df;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meter-row{display:grid;grid-template-columns:31px 1fr 48px;align-items:center;gap:6px;margin-top:5px;font-size:10px}.meter{height:8px;overflow:hidden;border-radius:999px;background:#ffffff19}.meter>i{display:block;height:100%;width:100%;transition:width .12s}.hp-fill{background:linear-gradient(90deg,#c63d42,#ef6d63)}.stamina-fill{background:linear-gradient(90deg,#d7a82e,#f3dc68)}
+    #hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:9px 14px;border-radius:999px;background:#0d131dcc;color:#d7e1ed;font-size:13px}
+    .selection{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,#09131fee,#0d1611ee);z-index:5}.selection[hidden]{display:none}.panel{width:min(680px,92vw);padding:28px;border:1px solid #ffffff24;border-radius:24px;background:#101925e8;box-shadow:0 24px 80px #0008}.panel h1{margin:0 0 8px;font-size:clamp(28px,5vw,48px)}.panel p{margin:0 0 22px;color:#b9c5d2}.faction-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.faction-card{min-height:150px;padding:20px;border:1px solid #ffffff26;border-radius:18px;color:white;text-align:left;cursor:pointer}.faction-card strong{display:block;font-size:22px}.faction-card span{display:block;margin-top:8px;opacity:.8}.ironhold{background:linear-gradient(145deg,#1a4e9d,#10294c)}.verdant{background:linear-gradient(145deg,#207b47,#113d29)}
+    .class-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.class-card{padding:17px;border:1px solid #ffffff26;border-radius:16px;background:#182433;color:#fff;text-align:left;cursor:pointer}.class-card:hover{border-color:#e8c77a}.class-card strong{display:block;font-size:18px}.class-card span{display:block;margin-top:5px;color:#aebbc9;font-size:13px}
+    #faction-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#263241;font-size:11px;font-weight:800;letter-spacing:.04em}
+    #crosshair{position:fixed;left:50%;top:50%;width:13px;height:13px;transform:translate(-50%,-50%);pointer-events:none;z-index:2}#crosshair:before,#crosshair:after{content:'';position:absolute;background:#fff9;box-shadow:0 0 3px #000}#crosshair:before{width:13px;height:1px;top:6px}#crosshair:after{width:1px;height:13px;left:6px}#combat-feedback{position:fixed;left:50%;top:57%;transform:translateX(-50%);font-weight:900;color:#fff;opacity:0;transition:opacity .15s;pointer-events:none;text-shadow:0 2px 5px #000;z-index:3}#combat-feedback.show{opacity:1}
+    #score-hud{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(470px,50vw);padding:8px 12px;border:1px solid #ffffff24;border-radius:13px;background:#0a1018e8;z-index:3}.score-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;font-size:12px;font-weight:900}.score-head span:last-child{text-align:right}.score-bars{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}.score-track{height:5px;border-radius:999px;background:#ffffff1a;overflow:hidden}.score-track i{display:block;height:100%;width:0;transition:width .2s}.iron-score{margin-left:auto;background:#3282f6}.verdant-score{background:#35b86b}#round-label{font-size:9px;color:#aebac7;letter-spacing:.08em}
+    #capture-hud{position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(300px,42vw);padding:9px 12px;border:1px solid #ffffff24;border-radius:12px;background:#0d131dcc;text-align:center;z-index:3}#capture-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.capture-track{height:6px;margin:6px 0 4px;overflow:hidden;border-radius:999px;background:#ffffff1f}.capture-track i{display:block;width:0;height:100%;background:#9aa4b0;transition:width .18s,background .18s}#capture-status{font-size:10px;color:#bdc8d3}
+    #victory-overlay{position:fixed;inset:0;display:grid;place-items:center;background:#05090dcc;z-index:7;text-align:center}#victory-overlay[hidden]{display:none}.victory-card{padding:36px 48px;border:1px solid #ffffff33;border-radius:24px;background:#121b28;box-shadow:0 28px 90px #000}.victory-card small{color:#e1c273;letter-spacing:.2em}.victory-card h2{margin:10px 0;font-size:clamp(38px,8vw,76px)}#victory-countdown{color:#bbc7d2}
+    #minimap-wrap{position:fixed;top:16px;right:16px;width:180px;height:180px;padding:8px;border:1px solid #ffffff24;border-radius:16px;background:#0d131de6;z-index:3}#minimap{width:100%;height:100%;display:block;border-radius:10px;background:#263424}#online-count{position:absolute;right:12px;top:11px;padding:3px 7px;border-radius:999px;background:#081019d9;font-size:9px;font-weight:800}
+    #resource-hud{position:fixed;top:206px;right:16px;width:214px;padding:10px 12px;border:1px solid #ffffff24;border-radius:13px;background:#0d131dcc;z-index:3;font-size:11px}.resource-title{color:#d6bc75;font-size:10px;font-weight:900;letter-spacing:.1em}.resource-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-top:7px}.resource-grid span:nth-child(even){text-align:right;font-weight:800}#action-prompt{position:fixed;left:50%;bottom:91px;transform:translateX(-50%);padding:7px 12px;border:1px solid #ffffff25;border-radius:999px;background:#0b1119e8;color:#fff;font-size:12px;z-index:3}#action-prompt[hidden]{display:none}#action-prompt.disabled{color:#d29a8c;border-color:#bc594755}
+    #objective-hint{position:fixed;left:16px;top:138px;width:236px;min-height:54px;padding:10px 38px 10px 12px;border:1px solid #ffffff20;border-radius:13px;background:#0d131dbd;z-index:3;font-size:11px;color:#e4e9ee}#objective-hint b{display:block;margin-bottom:3px;color:#dfc677;font-size:9px;letter-spacing:.1em}#help-button{position:absolute;right:7px;top:7px;width:27px;height:27px;border:1px solid #ffffff32;border-radius:50%;background:#ffffff10;color:#fff;cursor:pointer}#kill-feed{position:fixed;left:16px;top:204px;width:270px;display:grid;gap:5px;z-index:3;pointer-events:none}.kill-entry{padding:6px 9px;border-radius:9px;background:#0a1018b8;font-size:10px;animation:feed-in .2s ease-out}@keyframes feed-in{from{opacity:0;transform:translateX(-8px)}}
+    #death-overlay{position:fixed;inset:0;display:grid;place-items:center;background:#090b0eca;z-index:6;text-align:center}#death-overlay[hidden]{display:none}.death-card{padding:30px 42px;border:1px solid #ffffff26;border-radius:22px;background:#141b24}.death-card h2{margin:0 0 8px;font-size:42px;color:#e17a6f}.death-card p{margin:6px;color:#bdc7d0}
+    #onboarding{position:fixed;inset:0;display:grid;place-items:center;background:#071019e8;z-index:8}#onboarding[hidden]{display:none}.onboarding-card{width:min(640px,92vw);padding:28px;border:1px solid #ffffff2e;border-radius:24px;background:#121d2a;box-shadow:0 25px 90px #0009}.onboarding-card h2{margin:0 0 7px;font-size:32px}.onboarding-card>p{margin:0 0 18px;color:#b8c5d1}.onboarding-steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}.onboarding-steps div{padding:12px;border-radius:13px;background:#ffffff08;font-size:12px}.onboarding-steps b{display:block;margin-bottom:4px;color:#e3c77d}.primary-button{width:100%;margin-top:18px;padding:12px;border:0;border-radius:12px;background:#e0bd62;color:#1c1a13;font-weight:900;cursor:pointer}
+    #dev-debug{position:fixed;left:16px;bottom:120px;max-width:320px;padding:8px 10px;border:1px dashed #f0c96866;border-radius:9px;background:#080d13d9;color:#f0d98f;font:10px ui-monospace,monospace;z-index:9}#dev-debug[hidden]{display:none}
+    .mobile-only{display:none}#mobile-move-zone{position:fixed;touch-action:none;z-index:4;border-radius:28px;background:radial-gradient(circle at center,#ffffff0b,transparent 66%)}#joystick-base{position:absolute;width:112px;height:112px;display:none;transform:translate(-50%,-50%);border:2px solid #ffffff35;border-radius:50%;background:#0a111a7a;box-shadow:inset 0 0 28px #0006}#joystick-knob{position:absolute;left:50%;top:50%;width:48px;height:48px;transform:translate(-50%,-50%);border:2px solid #ffffff80;border-radius:50%;background:#dce9f12e;box-shadow:0 4px 18px #0008}#mobile-actions{position:fixed;z-index:4;display:none;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:7px;touch-action:none}#mobile-actions button,#stance-button{border:1px solid #ffffff3a;border-radius:50%;background:#111a26cc;color:#fff;font-weight:800;box-shadow:0 5px 18px #0008;touch-action:none}#mobile-fire{grid-row:1/3;background:#9f392fe0!important;font-size:14px}#mobile-aim{grid-column:2;grid-row:1}#mobile-jump{grid-column:2;grid-row:2}#mobile-action{grid-column:1/3;grid-row:3;border-radius:16px!important;background:#9c772ee0!important}#stance-button{position:fixed;z-index:4;display:none;border-radius:13px;font-size:11px}
+    @media (pointer:coarse),(max-width:700px){.mobile-only,#mobile-actions,#stance-button{display:grid}#hint,#kill-feed{display:none}#hotbar-wrap{gap:3px}#equipped-label{font-size:9px;padding:3px 7px}.hotbar{gap:3px}.hotbar-slot{width:44px;height:38px;padding:2px;font-size:8px;border-radius:8px}#action-prompt{bottom:72px;font-size:10px;max-width:230px;white-space:nowrap}#player-panel{padding:8px 9px}.meter-row{grid-template-columns:25px 1fr 42px;gap:3px;margin-top:3px}.resource-grid{gap:3px 7px;margin-top:4px}#resource-hud{padding:8px 9px}#capture-hud{padding:7px 9px}#objective-hint{padding:8px 35px 8px 9px;font-size:10px}#minimap-wrap{padding:5px}.onboarding-steps{grid-template-columns:1fr}.onboarding-card{max-height:92vh;overflow:auto}}
+    #hotbar-wrap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:grid;justify-items:center;gap:7px;z-index:3}#equipped-label{padding:5px 10px;border-radius:999px;background:#0b1119d9;color:#e7d8a5;font-size:12px}.hotbar{display:flex;gap:7px}.hotbar-slot{width:72px;height:52px;border:1px solid #ffffff30;border-radius:11px;background:#101823d9;color:#d8e2ec;font-size:11px;line-height:1.1;cursor:pointer}.hotbar-slot.selected{border:2px solid #f0c968;background:#3a3422;box-shadow:0 0 0 3px #f0c96822}.hotbar-slot:disabled{opacity:.25}
+  </style>
+</head>
+<body>
+  <section id="faction-select" class="selection">
+    <div class="panel">
+      <h1>เลือกฝ่ายของคุณ</h1>
+      <p>เลือกฐานก่อน แล้วจึงเตรียมตัวลงสนามรบ</p>
+      <div class="faction-grid">
+        <button class="faction-card ironhold" data-faction="ironhold"><strong>Ironhold</strong><span>กองทัพสีน้ำเงิน · ฐานฝั่งซ้าย x −80</span></button>
+        <button class="faction-card verdant" data-faction="verdant"><strong>Verdant</strong><span>กองทัพสีเขียว · ฐานฝั่งขวา x +80</span></button>
+      </div>
+    </div>
+  </section>
+  <section id="class-select" class="selection" hidden>
+    <div class="panel">
+      <h1>เลือกคลาส</h1>
+      <p>เลือกบทบาท MVP — เปลี่ยนความเร็ว HP และหน้าที่ในสนาม</p>
+      <div class="class-grid">
+        <button class="class-card" data-class="infantry"><strong>⚔️ ทหารราบ</strong><span>แนวหน้า · ดาบ / โล่ · HP สูง</span></button>
+        <button class="class-card" data-class="archer"><strong>🏹 พลธนู</strong><span>ระยะไกล · ธนู · HP ต่ำ</span></button>
+        <button class="class-card" data-class="worker"><strong>🪓 คนงาน</strong><span>เศรษฐกิจ · ขวาน / พลั่ว</span></button>
+        <button class="class-card" data-class="commander"><strong>🚩 แม่ทัพ</strong><span>ยุทธวิธี · ดาบ / แบบก่อสร้าง</span></button>
+      </div>
+    </div>
+  </section>
+  <div id="player-panel">
+    <div id="status">กำลังเชื่อมต่อ…</div>
+    <div id="faction-badge">ยังไม่มีฝ่าย</div>
+    <div class="meter-row"><b>HP</b><span class="meter"><i id="hp-fill" class="hp-fill"></i></span><span id="hp-value">—</span></div>
+    <div class="meter-row"><b>แรง</b><span class="meter"><i id="stamina-fill" class="stamina-fill"></i></span><span id="stamina-value">—</span></div>
+  </div>
+  <div id="crosshair"></div>
+  <div id="combat-feedback"></div>
+  <div id="score-hud" data-ui="faction-score-hud">
+    <div class="score-head"><span>🔵 Ironhold <b id="iron-score">0</b></span><span id="round-label">ROUND 1 · เป้าหมาย 1000</span><span><b id="verdant-score">0</b> Verdant 🟢</span></div>
+    <div class="score-bars"><span class="score-track"><i id="iron-score-bar" class="iron-score"></i></span><span class="score-track"><i id="verdant-score-bar" class="verdant-score"></i></span></div>
+  </div>
+  <div id="capture-hud" data-ui="capture-hud">
+    <div id="capture-title">Central Fort · เป็นกลาง</div>
+    <div class="capture-track"><i id="capture-progress"></i></div>
+    <div id="capture-status">เข้าสู่วงกลางเพื่อยึดป้อม</div>
+  </div>
+  <aside id="resource-hud" data-ui="resource-hud">
+    <div class="resource-title">ทรัพยากร</div>
+    <div class="resource-grid"><span>กระเป๋า 🪵</span><span id="inventory-wood">0</span><span>กระเป๋า 🪨</span><span id="inventory-stone">0 / 30</span><span>คลังฝ่าย 🪵</span><span id="faction-wood">0</span><span>คลังฝ่าย 🪨</span><span id="faction-stone">0</span></div>
+  </aside>
+  <aside id="minimap-wrap" data-ui="minimap">
+    <canvas id="minimap" width="320" height="320" aria-label="แผนที่ย่อสนามรบ"></canvas><span id="online-count">0 ONLINE</span>
+  </aside>
+  <aside id="objective-hint" data-ui="class-objective"><b>เป้าหมายคลาส</b><span id="objective-text">เลือกฝ่ายและคลาสเพื่อเริ่ม</span><button id="help-button" aria-label="เปิดวิธีเล่น">?</button></aside>
+  <div id="kill-feed" aria-live="polite"></div>
+  <div id="action-prompt" data-ui="context-action" hidden>ใช้/E</div>
+  <div id="dev-debug" hidden></div>
+  <div id="hint">WASD เดิน · เมาส์มอง · คลิกซ้ายใช้ · คลิกขวารอง · E โต้ตอบ · V เปลี่ยนมุม</div>
+  <div id="hotbar-wrap">
+    <div id="equipped-label">ถือ: —</div>
+    <div id="hotbar" class="hotbar" aria-label="ช่องอุปกรณ์">
+      <button class="hotbar-slot" data-slot="1">1</button><button class="hotbar-slot" data-slot="2">2</button><button class="hotbar-slot" data-slot="3">3</button><button class="hotbar-slot" data-slot="4">4</button><button class="hotbar-slot" data-slot="5">5</button>
+    </div>
+  </div>
+  <div id="mobile-move-zone" class="mobile-only" data-control="dynamic-move-zone" aria-label="พื้นที่จอยเคลื่อนที่">
+    <div id="joystick-base"><div id="joystick-knob"></div></div>
+  </div>
+  <div id="mobile-actions" class="mobile-only" data-control="mobile-action-cluster">
+    <button id="mobile-fire" data-control="fire">ยิง</button>
+    <button id="mobile-aim" data-control="aim">เล็ง</button>
+    <button id="mobile-jump" data-control="jump">โดด</button>
+    <button id="mobile-action" data-control="action" disabled>ใช้</button>
+  </div>
+  <button id="stance-button" class="mobile-only" data-control="crouch-prone">ย่อ</button>
+  <section id="victory-overlay" data-ui="victory-overlay" hidden>
+    <div class="victory-card"><small>ชัยชนะของฝ่าย</small><h2 id="victory-faction">—</h2><div id="victory-final-score">0 – 0</div><p id="victory-countdown">เริ่มรอบใหม่ใน 5 วินาที</p></div>
+  </section>
+  <section id="death-overlay" data-ui="death-overlay" hidden>
+    <div class="death-card"><h2>คุณเสียชีวิต</h2><p id="respawn-countdown">เกิดใหม่ใน 3 วินาที</p><p id="respawn-location">จุดเกิด: ฐานฝ่าย</p></div>
+  </section>
+  <section id="onboarding" data-ui="onboarding-help" hidden>
+    <div class="onboarding-card">
+      <h2>ยึดป้อม · สร้างแนวรบ · ชนะเป็นฝ่าย</h2><p>เข้าใจสนามนี้ได้ใน 60 วินาที</p>
+      <div class="onboarding-steps">
+        <div><b>1 · เลือกฝ่ายและคลาส</b>Ironhold เกิดซ้าย · Verdant เกิดขวา</div>
+        <div><b>2 · ยึด Central Fort</b>ฝ่ายที่มีคนในวงมากกว่าจะยึดป้อม</div>
+        <div><b>3 · คนงานสร้างเศรษฐกิจ</b>ถือขวานเก็บไม้ ถือพลั่วเก็บหิน แล้วฝากคลัง</div>
+        <div><b>4 · แม่ทัพสร้างแนวรบ</b>ใช้ทรัพยากรฝ่ายวางกำแพงและธงรวมพล</div>
+        <div><b>5 · ต่อสู้ด้วยของในมือ</b>ดาบต้องเข้าระยะ โล่กันด้านหน้า ธนูต้องง้าง</div>
+        <div><b>6 · ถึง 1,000 คะแนนก่อน</b>ครองป้อมรับ 10 คะแนนทุก 10 วินาที</div>
+      </div>
+      <button id="dismiss-onboarding" class="primary-button">เข้าใจแล้ว — ลงสนาม</button>
+    </div>
+  </section>
+  <script type="module" src="/game.js"></script>
+</body>
+</html>

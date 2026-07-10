@@ -1,0 +1,22 @@
+{
+  "name": "faction-war-arena",
+  "version": "0.1.0",
+  "description": "Server-authoritative browser 3D faction war MVP",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "DEV_MODE=1 node --watch server/index.js",
+    "check": "node --check server/index.js && node --check server/room.js && node --check server/classes.js && node --check server/protocol.js && node --check public/net.js && node --check public/mobile-layout.js && node --check public/game.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "test:smoke": "node --test --test-concurrency=1 tests/server-smoke.test.js",
+    "test:http": "node --test --test-concurrency=1 tests/http-sanity.test.js",
+    "test:authority": "node --test --test-concurrency=1 tests/authority.test.js tests/combat.test.js tests/resources-buildings.test.js tests/objectives.test.js"
+  },
+  "dependencies": {
+    "express": "4.21.2",
+    "three": "0.180.0",
+    "ws": "8.18.3"
+  }
+}
