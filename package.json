@@ -12,7 +12,10 @@
     "test": "node --test --test-concurrency=1 tests/*.test.js",
     "test:smoke": "node --test --test-concurrency=1 tests/server-smoke.test.js",
     "test:http": "node --test --test-concurrency=1 tests/http-sanity.test.js",
-    "test:authority": "node --test --test-concurrency=1 tests/authority.test.js tests/combat.test.js tests/resources-buildings.test.js tests/objectives.test.js"
+    "test:authority": "node --test --test-concurrency=1 tests/authority.test.js tests/combat.test.js tests/resources-buildings.test.js tests/objectives.test.js",
+    "mine": "node abandoned-mine/server.js",
+    "mine:check": "node --check abandoned-mine/server.js && node --check abandoned-mine/src/main.js && node --check abandoned-mine/src/world.js && node --check abandoned-mine/src/player.js && node --check abandoned-mine/src/materials.js && node --check abandoned-mine/src/textures.js && node --check abandoned-mine/src/logic.js && node --check abandoned-mine/src/input.js && node --check abandoned-mine/src/hud.js",
+    "mine:test": "node --test abandoned-mine/tests/logic.test.js"
   },
   "dependencies": {
     "express": "4.21.2",

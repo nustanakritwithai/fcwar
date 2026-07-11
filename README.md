@@ -1,5 +1,8 @@
 # Faction War Arena
 
+> **Side project:** โปรเจกต์เรียนรู้ Mobile Realistic PBR แยกต่างหากอยู่ที่
+> [`abandoned-mine/`](abandoned-mine/README.md) — รันด้วย `npm run mine`
+
 An original, low-poly medieval/fantasy browser game built with Node.js,
 Express, WebSocket, Three.js, and plain JavaScript. The simulation is
 server-authoritative: clients send controls and action requests, while the
