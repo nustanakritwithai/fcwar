@@ -24,9 +24,11 @@ const mime = {
 
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-  if (urlPath === '/') urlPath = '/abandoned-mine/';
-  if (urlPath.endsWith('/')) urlPath += 'index.html';
   if (urlPath === '/healthz') { res.writeHead(200); res.end('ok'); return; }
+  // redirect ราก → โฟลเดอร์เกม (ต้อง redirect จริง ไม่ใช่เสิร์ฟแทน
+  // เพราะ index.html อ้าง ./src/... แบบ relative กับ /abandoned-mine/)
+  if (urlPath === '/') { res.writeHead(302, { Location: '/abandoned-mine/' }); res.end(); return; }
+  if (urlPath.endsWith('/')) urlPath += 'index.html';
 
   // Only expose the game folder and three.js — nothing else in the repo.
   if (!urlPath.startsWith('/abandoned-mine/') && !urlPath.startsWith('/node_modules/three/')) {

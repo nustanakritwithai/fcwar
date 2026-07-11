@@ -1,10 +1,13 @@
+# ปัจจุบัน deploy เกม Abandoned Mine (abandoned-mine/) แทน Faction War Arena
+# คงชื่อ service เดิมไว้เพื่อให้ Render อัปเดต service เดิมแบบ in-place (URL เดิม)
+# ถ้าอยากกลับไปรันเกมเก่า: เปลี่ยน startCommand กลับเป็น `npm start`
 services:
   - type: web
     name: faction-war-arena
     runtime: node
     plan: free
     buildCommand: npm ci
-    startCommand: npm start
+    startCommand: npm run mine
     healthCheckPath: /healthz
     autoDeployTrigger: commit
     envVars:
